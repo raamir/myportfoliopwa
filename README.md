@@ -17,131 +17,177 @@
 
 1.  **Tutorials/Resources Used**
 
-    Follow these links to create your portfolio
-    `https://www.youtube.com/watch?v=9AboneIxeM8&list=PL3KAvm6JMiowqFTXj3oPQkhP7aCgRHFTm`
-    `https://appdividend.com/2018/03/14/how-to-build-progressive-web-application-using-react-js/`
-    `https://medium.com/front-end-weekly/build-a-realtime-pwa-with-react-99e7b0fd3270`
+      Follow these links to create your portfolio
+      `https://www.youtube.com/watch?v=9AboneIxeM8&list=PL3KAvm6JMiowqFTXj3oPQkhP7aCgRHFTm`
+      `https://appdividend.com/2018/03/14/how-to-build-progressive-web-application-using-react-js/`
+      `https://medium.com/front-end-weekly/build-a-realtime-pwa-with-react-99e7b0fd3270`
 
 2. **Create App**
 
-In the project directory, you can run:
+      In the project directory, you can run:
 
-### `npm create react-app myportfoliosite`
-then
-### `npm start`
+      ### `npm create react-app myportfoliosite`
+      then
+      ### `npm start`
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+      Runs the app in the development mode.<br>
+      Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+      The page will reload if you make edits.<br>
+      You will also see any lint errors in the console.
 
-### `npm test`
+      ### `npm test`
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+      Launches the test runner in the interactive watch mode.<br>
+      See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+      ### `npm run build`
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+      Builds the app for production to the `build` folder.<br>
+      It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+      The build is minified and the filenames include the hashes.<br>
+      Your app is ready to be deployed!
 
-3. **Create a service-worker.js file in public folder**
-Enter the following contents:
+3. **Create a service-worker.js file and modify manifest.json file in public folder**
 
-`// Flag for enabling cache in production
-      var doCache = false;
-      var CACHE_NAME = 'myportfoliosite-cache';
+      Enter the following contents to service-worker.js:
 
-      // Code to handle install prompt on desktop
+      `// Flag for enabling cache in production
+            var doCache = false;
+            var CACHE_NAME = 'myportfoliosite-cache';
 
-      let deferredPrompt;
-      const addBtn = document.querySelector('.add-button');
-      addBtn.style.display = 'none';
+            // Code to handle install prompt on desktop
 
-      // Delete old caches
-      self.addEventListener('activate', event => {
-        const currentCachelist = [CACHE_NAME];
-        event.waitUntil(
-          caches.keys()
-            .then(keyList =>
-              Promise.all(keyList.map(key => {
-                if (!currentCachelist.includes(key)) {
-                  return caches.delete(key);
-                }
-              }))
-            )
-        );
-      });
-      // This triggers when user starts the app
-      self.addEventListener('install', function(event) {
-        if (doCache) {
-          event.waitUntil(
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                fetch('asset-manifest.json')
-                  .then(response => {
-                    response.json();
+            let deferredPrompt;
+            const addBtn = document.querySelector('.add-button');
+            addBtn.style.display = 'none';
+
+            // Delete old caches
+            self.addEventListener('activate', event => {
+              const currentCachelist = [CACHE_NAME];
+              event.waitUntil(
+                caches.keys()
+                  .then(keyList =>
+                    Promise.all(keyList.map(key => {
+                      if (!currentCachelist.includes(key)) {
+                        return caches.delete(key);
+                      }
+                    }))
+                  )
+              );
+            });
+            // This triggers when user starts the app
+            self.addEventListener('install', function(event) {
+              if (doCache) {
+                event.waitUntil(
+                  caches.open(CACHE_NAME)
+                    .then(function(cache) {
+                      fetch('asset-manifest.json')
+                        .then(response => {
+                          response.json();
+                        })
+                        .then(assets => {
+                          // We will cache initial page and the main.js
+                          // We could also cache assets like CSS and images
+                          const urlsToCache = [
+                            '/',
+                            assets['main.js']
+                          ];
+                          cache.addAll(urlsToCache);
+                        })
+                    })
+                );
+              }
+            });
+            // Here we intercept request and serve up the matching files
+            self.addEventListener('fetch', function(event) {
+              if (doCache) {
+                event.respondWith(
+                  caches.match(event.request).then(function(response) {
+                    return response || fetch(event.request);
                   })
-                  .then(assets => {
-                    // We will cache initial page and the main.js
-                    // We could also cache assets like CSS and images
-                    const urlsToCache = [
-                      '/',
-                      assets['main.js']
-                    ];
-                    cache.addAll(urlsToCache);
-                  })
-              })
-          );
-        }
-      });
-      // Here we intercept request and serve up the matching files
-      self.addEventListener('fetch', function(event) {
-        if (doCache) {
-          event.respondWith(
-            caches.match(event.request).then(function(response) {
-              return response || fetch(event.request);
+                );
+              }
             })
-          );
-        }
-      })
-      `
+            
+4. **Add the following script in index.html file in public folder**
+        `<script>
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js').then(function(registration) {
+                  console.log('Worker registration successful', registration.scope);
+                }, function(err) {
+                  console.log('Worker registration failed', err);
+                }).catch(function(err) {
+                  console.log(err);
+                });
+              });
+            } else {
+              console.log('Service Worker is not supported by browser.');
+            }
+          </script>`
+          
+5. **File Structure**
+
+      `my-app/
+        README.md
+        node_modules/
+        package.json
+        public/
+          index.html
+          favicon.ico
+        src/
+          App.css
+          App.js
+          App.test.js
+          index.css
+          index.js
+          logo.svg `
+
+
+6. **Edit your app by adding componenents in src folder**
+            `
      
-3. **Install Http-server to run the pwa app**
-## `npm install http-server -g`
+7. **Install Http-server to run the pwa app**
 
-## `http-server ./build -p 3000`
+      ## `npm install http-server -g`
 
-## Learn More
+      ## `http-server ./build -p 3000`
+      
+8. **Deploy to Surge**
+      `npm install --global surge`
+      `surge
+      `npm run build`
+      `ls build
+      `surge build/ `
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+7. **Learn More**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+      You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### Code Splitting
+      To learn React, check out the [React documentation](https://reactjs.org/).
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+      ### Code Splitting
 
-### Analyzing the Bundle Size
+      This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+      ### Analyzing the Bundle Size
 
-### Making a Progressive Web App
+      This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+      ### Making a Progressive Web App
 
-### Advanced Configuration
+      This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+      ### Advanced Configuration
 
-### Deployment
+      This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+      ### Deployment
 
-### `npm run build` fails to minify
+      This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+      ### `npm run build` fails to minify
+
+      This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
