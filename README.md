@@ -1,9 +1,33 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<!-- AUTO-GENERATED-CONTENT:START (STARTER) -->
+<p align="center">
+  <a href="https://engineering.musefind.com/build-your-first-progressive-web-app-with-react-8e1449c575cd">
+    <img alt="VanillaJs" src="https://cdn4.iconfinder.com/data/icons/logos-3/600/React.js_logo-512.png" width="100" />
+  </a>
+</p>
+<h1 align="center">
+  Portfolio App PWA Support Documentation
+</h1>
+<h3> App can be accessed and installed from: https://engineering.musefind.com/build-your-first-progressive-web-app-with-react-8e1449c575cd
+ </h3>
+  <p> <b> ***NOTE: Make sure to check Offline in Developer Tools for it to work*** <b> <p>
+    <img alt="Application" src="https://developers.google.com/web/tools/chrome-devtools/images/panels/application.png" width="1000" />
 
-## Available Scripts
+
+## 🚁 Guide
+
+1.  **Tutorials/Resources Used**
+
+    Follow these links to create your portfolio
+    `https://www.youtube.com/watch?v=9AboneIxeM8&list=PL3KAvm6JMiowqFTXj3oPQkhP7aCgRHFTm`
+    `https://appdividend.com/2018/03/14/how-to-build-progressive-web-application-using-react-js/`
+    `https://medium.com/front-end-weekly/build-a-realtime-pwa-with-react-99e7b0fd3270`
+
+2. **Create App**
 
 In the project directory, you can run:
 
+### `npm create react-app myportfoliosite`
+then
 ### `npm start`
 
 Runs the app in the development mode.<br>
@@ -25,17 +49,72 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Create a service-worker.js file in public folder**
+Enter the following contents:
 
-### `npm run eject`
+`// Flag for enabling cache in production
+      var doCache = false;
+      var CACHE_NAME = 'myportfoliosite-cache';
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+      // Code to handle install prompt on desktop
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+      let deferredPrompt;
+      const addBtn = document.querySelector('.add-button');
+      addBtn.style.display = 'none';
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+      // Delete old caches
+      self.addEventListener('activate', event => {
+        const currentCachelist = [CACHE_NAME];
+        event.waitUntil(
+          caches.keys()
+            .then(keyList =>
+              Promise.all(keyList.map(key => {
+                if (!currentCachelist.includes(key)) {
+                  return caches.delete(key);
+                }
+              }))
+            )
+        );
+      });
+      // This triggers when user starts the app
+      self.addEventListener('install', function(event) {
+        if (doCache) {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                fetch('asset-manifest.json')
+                  .then(response => {
+                    response.json();
+                  })
+                  .then(assets => {
+                    // We will cache initial page and the main.js
+                    // We could also cache assets like CSS and images
+                    const urlsToCache = [
+                      '/',
+                      assets['main.js']
+                    ];
+                    cache.addAll(urlsToCache);
+                  })
+              })
+          );
+        }
+      });
+      // Here we intercept request and serve up the matching files
+      self.addEventListener('fetch', function(event) {
+        if (doCache) {
+          event.respondWith(
+            caches.match(event.request).then(function(response) {
+              return response || fetch(event.request);
+            })
+          );
+        }
+      })
+      `
+     
+3. **Install Http-server to run the pwa app**
+## `npm install http-server -g`
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## `http-server ./build -p 3000`
 
 ## Learn More
 
