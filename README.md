@@ -53,9 +53,9 @@
 
       Enter the following contents to service-worker.js:
 
-      `// Flag for enabling cache in production
-            var doCache = false;
-            var CACHE_NAME = 'myportfoliosite-cache';
+      `// Flag for enabling cache in production`
+          ` var doCache = false;
+           ` var CACHE_NAME = 'myportfoliosite-cache';
 
             // Code to handle install prompt on desktop
 
