@@ -7,7 +7,7 @@
 <h1 align="center">
   Portfolio App PWA Support Documentation
 </h1>
-<h3> App can be accessed and installed from: https://engineering.musefind.com/build-your-first-progressive-web-app-with-react-8e1449c575cd
+<h3> App can be accessed and installed from: https://nosy-flower.surge.sh/
  </h3>
   <p> <b> ***NOTE: Make sure to check Offline in Developer Tools for it to work*** <b> <p>
     <img alt="Application" src="https://developers.google.com/web/tools/chrome-devtools/images/panels/application.png" width="1000" />
