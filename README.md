@@ -53,7 +53,9 @@
 
       Enter the following contents to service-worker.js:
 
-      `// Flag for enabling cache in production
+      `
+      
+          // Flag for enabling cache in production
       
               var doCache = false;
               var CACHE_NAME = 'myportfoliosite-cache';
@@ -150,12 +152,10 @@
           index.css
           index.js
           logo.svg 
-          
-          `
+        `
 
 
 6. **Edit your app by adding componenents in src folder**
-            `
      
 7. **Install Http-server to run the pwa app**
 
