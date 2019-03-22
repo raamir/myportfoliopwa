@@ -53,10 +53,11 @@
 
       Enter the following contents to service-worker.js:
 
-      `// Flag for enabling cache in production`
-          ` var doCache = false;
-           ` var CACHE_NAME = 'myportfoliosite-cache';
-
+      `// Flag for enabling cache in production
+      
+              var doCache = false;
+              var CACHE_NAME = 'myportfoliosite-cache';
+              
             // Code to handle install prompt on desktop
 
             let deferredPrompt;
@@ -110,9 +111,11 @@
                 );
               }
             })
+            `
             
 4. **Add the following script in index.html file in public folder**
         `<script>
+        
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', function() {
                 navigator.serviceWorker.register('service-worker.js').then(function(registration) {
@@ -126,11 +129,14 @@
             } else {
               console.log('Service Worker is not supported by browser.');
             }
-          </script>`
+          </script>
+          `
           
 5. **File Structure**
 
-      `my-app/
+      `
+        
+        my-app/
         README.md
         node_modules/
         package.json
@@ -143,7 +149,9 @@
           App.test.js
           index.css
           index.js
-          logo.svg `
+          logo.svg 
+          
+          `
 
 
 6. **Edit your app by adding componenents in src folder**
@@ -156,11 +164,15 @@
       ## `http-server ./build -p 3000`
       
 8. **Deploy to Surge**
-      `npm install --global surge`
-      `surge
-      `npm run build`
-      `ls build
-      `surge build/ `
+      `
+   
+        npm install --global surge
+        surge
+        npm run build`
+        ls build
+        surge build/ 
+        
+      `
 
 7. **Learn More**
 
